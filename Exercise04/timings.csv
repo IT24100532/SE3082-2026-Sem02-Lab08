@@ -1,0 +1,9 @@
+exercise,processes,time_s
+sum_mpi,1,0.003256
+sum_mpi,2,0.001656
+sum_mpi,4,0.000930
+sum_mpi,8,0.000925
+montecarlo_mpi,1,0.133954
+montecarlo_mpi,2,0.067256
+montecarlo_mpi,4,0.034630
+montecarlo_mpi,8,0.024338

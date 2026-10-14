@@ -1,0 +1,21 @@
+Exercise 7: Exercise 6 with Buffered Send (MPI_Bsend)
+Run on: Debian Linux container (Docker), Open MPI 5.0.7, gcc 14.2, 8 cpus. Build: make   Run: make run
+
+The workers now attach a buffer (MPI_Pack_size + MPI_BSEND_OVERHEAD), send their count
+with MPI_Bsend, and detach the buffer. Rank 0 still receives from MPI_ANY_SOURCE.
+
+Output:
+received from:
+processes = 1, pi = 3.141386, inside = 7853466, time = 0.131124 s
+received from: 1
+processes = 2, pi = 3.140890, inside = 7852224, time = 0.069179 s
+received from: 2 1 3
+processes = 4, pi = 3.141423, inside = 7853558, time = 0.034659 s
+received from: 5 1 2 3 4 7 6
+processes = 8, pi = 3.141721, inside = 7854303, time = 0.024910 s
+
+The results are identical to Exercises 3 and 6, and the times are about the same.
+Each worker sends only one small number, and Open MPI already sends small messages
+without waiting for the receiver, so buffering makes no visible difference here. Bsend
+matters when messages are large or the receiver is late: then MPI_Send may wait, but
+MPI_Bsend returns at once because the data has been copied into the buffer.

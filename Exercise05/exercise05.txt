@@ -1,0 +1,36 @@
+Exercise 5
+Run on: Debian Linux container (Docker), Open MPI 5.0.7, gcc 14.2, 8 cpus. Build: make   Run: make run
+
+1. Source and destination do not match (mismatch.cc, from message1.cc)
+   Rank 0 sends to rank 1, but rank 1 waits for a message from rank 2, and rank 2 never
+   sends anything. Run: mpirun -np 3 ./mismatch
+
+Process 1 waiting for a message from process 2...
+Process 0 sent 42
+exit code 124 (124 = killed by timeout)
+
+   What happens: the program HANGS (a deadlock). Rank 0 finishes its send (a small
+   message is buffered, so MPI_Send returns), but rank 1 waits in MPI_Recv forever for a
+   message from rank 2 that never comes, and the program never finishes. It had to be
+   stopped (here by "timeout 10", exit code 124). MPI gives no error, because a message
+   from rank 2 could still arrive in theory. The message from rank 0 is never received.
+
+2. message2.cc with Buffered Send (message2_bsend.cc)
+   - Rank 0 attaches a buffer big enough for all 3 messages (3 x (size of one int +
+     MPI_BSEND_OVERHEAD)) with MPI_Buffer_attach, before sending.
+   - Each value is in its own variable (numbers[0], numbers[1], numbers[2]), so no value
+     is overwritten before it has been sent.
+   - MPI_Bsend copies each message into the buffer and returns at once, without waiting
+     for rank 1.
+   - MPI_Buffer_detach waits until all buffered messages have left, then frees the buffer.
+
+   Output (mpirun -np 2):
+   Process 1 received 0
+   Process 1 received 10
+   Process 1 received 20
+   Process 0 sent 0
+   Process 0 sent 10
+   Process 0 sent 20
+
+   Rank 1 can print "received" before rank 0 prints "sent", because Bsend lets rank 0 carry
+   on before the messages are delivered, and the two processes print at the same time.

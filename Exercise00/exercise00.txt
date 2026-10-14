@@ -1,0 +1,28 @@
+Exercise 0: in-class activities (SE4060-MPI-Part1)
+Run on: Debian Linux container (Docker), Open MPI 5.0.7, gcc 14.2, 8 cpus. Build: make   Run: make run
+
+The programs use C++ headers (<cstdio>), so they are built with mpicxx. The repo's
+job1.pbs is for submitting to the cluster with qsub; here they were run with mpirun.
+messages1.cc and messaage2.cc send from rank 1 to rank 3, so they need at least 4 processes.
+
+HelloMPI.c (mpirun -np 4):
+Just a normal process From rank 3 machine se3082-lab08
+Hello World! From rank 0 machine se3082-lab08
+Just a normal process From rank 1 machine se3082-lab08
+Just a normal process From rank 2 machine se3082-lab08
+Rank 0 prints "Hello World!", every other rank prints "Just a normal process". All ranks
+run on the same machine here, so the machine name is the same.
+
+messages1.cc (mpirun -np 4): rank 1 sends x = 30 to rank 3 with MPI_Ssend.
+Just a normal process From rank 0 machine se3082-lab08
+Just a normal process From rank 2 machine se3082-lab08
+SEnding message to computer 3 from computer 1
+in computer 3 the value of y is 30
+
+messaage2.cc (mpirun -np 4): rank 1 sends an array of 10 numbers (0, 10, ..., 90) to rank 3.
+Just a normal process From rank 0 machine se3082-lab08
+SEnding message to computer 3 from computer 1
+in computer 3 the value of y is printed
+Just a normal process From rank 2 machine se3082-lab08
+
+The lines come in a different order every run, because all processes print at the same time.

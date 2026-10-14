@@ -1,0 +1,21 @@
+Exercise 3: Pi with the Monte Carlo method and MPI, 10,000,000 points
+Run on: Debian Linux container (Docker), Open MPI 5.0.7, gcc 14.2, 8 cpus. Build: make   Run: make run
+
+Each process throws its share of the random points with its own random seed and counts
+how many fall inside the quarter circle. The other processes send their counts to rank 0
+with MPI_Send; rank 0 receives them from rank 1, 2, 3, ... in that order (fixed source).
+pi ~= 4 x (total inside) / 10,000,000.
+Compile and run:  mpicc -O2 montecarlo_mpi.c -o montecarlo_mpi && mpirun -np <P> ./montecarlo_mpi
+
+Output:
+received from:
+processes = 1, pi = 3.141386, inside = 7853466, time = 0.132461 s
+received from: 1
+processes = 2, pi = 3.140890, inside = 7852224, time = 0.128414 s
+received from: 1 2 3
+processes = 4, pi = 3.141423, inside = 7853558, time = 0.037215 s
+received from: 1 2 3 4 5 6 7
+processes = 8, pi = 3.141721, inside = 7854303, time = 0.028467 s
+
+pi is about 3.141 for every number of processes. The value changes a little with the number
+of processes, because each process uses its own random sequence, so different points are drawn.
